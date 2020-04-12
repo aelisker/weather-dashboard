@@ -1,0 +1,5 @@
+html, body, .fill, .search-col {
+  height: 100vh; 
+  /* min-height: 100%;
+  height: 100%; */
+}
