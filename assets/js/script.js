@@ -2,6 +2,7 @@ var apiKey = "a684d65ea8c8378147bbc598bfac93a8";
 
 var queryCityBtnEl = document.querySelector("#query-city-btn");
 var queryCityInputEl = document.querySelector("#query-city-input");
+var fiveDayForcastEl = document.querySelector("#weather-cards");
 
 var queryLat = '';
 var queryLon = '';
@@ -74,6 +75,7 @@ var getLatLon = function(cityState) {
 };
 
 var getWeatherObject = function() {
+  weatherObject = [];
   var apiUrl = 
   'https://api.openweathermap.org/data/2.5/onecall?lat=' +
   queryLat + 
@@ -102,7 +104,28 @@ var getWeatherObject = function() {
 
 var printFiveDays = function() {
   for (var i = 1; i <= 5; i++) {
-    console.log('Temp: ' + weatherObject.daily[i].temp.day + ' F');
+    var date = moment.unix(weatherObject.daily[i].dt).format("MMMM Do YYYY");
+    var temp = 'Temp: ' + weatherObject.daily[i].temp.day + ' °F';
+    var humid = 'Humidity: ' + weatherObject.daily[i].humidity + '%';
+    var icon = 'https://openweathermap.org/img/wn/' + weatherObject.daily[i].weather[0].icon + '@2x.png';
+
+    var cardBody = $("<div>");
+    cardBody.classList = 'card bg-primary';
+
+    var cardHeader = $("<h5>");
+    cardHeader.classList = 'card-title';
+    cardHeader.value = date;
+    $(cardBody).append(cardHeader);
+
+    var cardIcon = $("<img>");
+    $(cardIcon).attr('src', icon);
+    $(cardBody).append(cardIcon);
+
+    var cardText = $("<h6>");
+    cardText.value = temp + humid;
+    $(cardBody).append(cardText);
+
+    $(fiveDayForcastEl).append(cardBody);
   }
 };
 
