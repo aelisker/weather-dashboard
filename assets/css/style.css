@@ -3,3 +3,12 @@ html, body, .fill, .search-col {
   /* min-height: 100%;
   height: 100%; */
 }
+
+header {
+  padding: 5px 0;
+}
+
+.img-icon {
+  width: 100px;
+  align-self: center;
+}

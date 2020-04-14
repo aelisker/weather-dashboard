@@ -3,9 +3,11 @@ var apiKey = "a684d65ea8c8378147bbc598bfac93a8";
 var queryCityBtnEl = document.querySelector("#query-city-btn");
 var queryCityInputEl = document.querySelector("#query-city-input");
 var fiveDayForcastEl = document.querySelector("#weather-cards");
+var currentDayContainerEl = document.querySelector("#current-day");
 
 var queryLat = '';
 var queryLon = '';
+var currentCity = '';
 
 var weatherObject = [];
 
@@ -61,6 +63,7 @@ var getLatLon = function(cityState) {
                   console.log(data);
                   queryLat = data.city.coord.lat;
                   queryLon = data.city.coord.lon;
+                  currentCity = data.city.name;
                   getWeatherObject();
               });
           }
@@ -102,6 +105,34 @@ var getWeatherObject = function() {
       })
 };
 
+var printCurrentDay = function() {
+  var currentDayEl = document.createElement("div");
+  currentDayEl.classList = 'card-body';
+
+  var cityDateIconEl = document.createElement("div");
+  var cityDateEl = document.createElement("h2");
+
+  var icon = 'https://openweathermap.org/img/wn/' + weatherObject.current.weather[0].icon + '@2x.png';
+  var currentIcon = document.createElement("img");
+  currentIcon.setAttribute('src', icon);
+  currentIcon.classList = 'img-icon d-inline';
+
+  var cityDateString = 
+    currentCity + 
+    ' (' +
+    moment.unix(weatherObject.current.dt).format("MMMM Do YYYY") +
+    ')';
+
+  cityDateEl.textContent = cityDateString;
+  cityDateEl.classList = 'd-inline';
+  cityDateIconEl.appendChild(cityDateEl);
+  cityDateIconEl.appendChild(currentIcon);
+  currentDayEl.appendChild(cityDateIconEl);
+
+  currentDayContainerEl.setAttribute('style', 'margin: 15px');
+  currentDayContainerEl.appendChild(currentDayEl);
+};
+
 var printFiveDays = function() {
   for (var i = 1; i <= 5; i++) {
     var date = moment.unix(weatherObject.daily[i].dt).format("MMMM Do YYYY");
@@ -109,23 +140,30 @@ var printFiveDays = function() {
     var humid = 'Humidity: ' + weatherObject.daily[i].humidity + '%';
     var icon = 'https://openweathermap.org/img/wn/' + weatherObject.daily[i].weather[0].icon + '@2x.png';
 
-    var cardBody = $("<div>");
-    cardBody.classList = 'card bg-primary';
+    var cardBody = document.createElement("div");
+    cardBody.classList = 'card bg-primary text-white';
 
-    var cardHeader = $("<h5>");
-    cardHeader.classList = 'card-title';
-    cardHeader.value = date;
-    $(cardBody).append(cardHeader);
+    var cardHeader = document.createElement("h5");
+    cardHeader.classList = 'card-title text-center';
+    cardHeader.textContent = date;
+    cardBody.appendChild(cardHeader);
 
-    var cardIcon = $("<img>");
-    $(cardIcon).attr('src', icon);
-    $(cardBody).append(cardIcon);
+    var cardIcon = document.createElement("img");
+    cardIcon.setAttribute('src', icon);
+    cardIcon.classList = 'img-icon';
+    cardBody.appendChild(cardIcon);
 
-    var cardText = $("<h6>");
-    cardText.value = temp + humid;
-    $(cardBody).append(cardText);
+    var cardTemp = document.createElement("p");
+    cardTemp.textContent = temp;
+    cardTemp.classList = 'pl-3';
+    cardBody.appendChild(cardTemp);
 
-    $(fiveDayForcastEl).append(cardBody);
+    var cardHumid = document.createElement("p");
+    cardHumid.textContent = humid;
+    cardHumid.classList = 'pl-3';
+    cardBody.appendChild(cardHumid);
+
+    fiveDayForcastEl.appendChild(cardBody);
   }
 };
 
