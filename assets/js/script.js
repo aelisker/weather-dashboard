@@ -73,7 +73,7 @@ var getLatLon = function(cityState) {
       })
       // .catch(function(error) {
       //     //notice this `.catch()` getting chained onto the end of the `.then()` method
-      //     alert("Unable to connect to Github");
+      //     alert("Unable to connect to Weather API");
       // });
 };
 
@@ -149,31 +149,27 @@ var printCurrentDay = function() {
   currentTemp.classList = 'pl-3';
   currentDayEl.appendChild(currentTemp);
 
-  //create p for temp
-  var currentTemp = document.createElement("p");
-  currentTemp.textContent = temp;
-  currentTemp.classList = 'pl-3';
-  currentDayEl.appendChild(currentTemp);
-
   //create p for humidity
   var currentHumidity = document.createElement("p");
   currentHumidity.textContent = humid;
   currentHumidity.classList = 'pl-3';
   currentDayEl.appendChild(currentHumidity);
 
-  //create p for uv index
+  //create p for uv index pretext
   var currentUV = document.createElement("p");
   currentUV.textContent = uvIndex;
   currentUV.classList = 'pl-3';
 
+  //create span for uv index
   var uvSpan = document.createElement("span");
-  uvSpan.textContent = parseFloat(weatherObject.current.uvi);
+  uvSpan.value = parseFloat(weatherObject.current.uvi);
+  uvSpan.textContent = uvSpan.value;
 
   //set span background color based on index value
-  if (uvSpan <= 3) {
+  if (uvSpan.value <= 3) {
     uvSpan.classList = 'badge badge-success text-white';
   }
-  else if (uvSpan > 3 && uvSpan <= 7) {
+  else if (uvSpan.value > 3 && uvSpan.value <= 7) {
     uvSpan.classList = 'badge badge-warning text-white';
   }
   else {
