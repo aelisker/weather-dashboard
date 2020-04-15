@@ -149,6 +149,12 @@ var printCurrentDay = function() {
   currentTemp.classList = 'pl-3';
   currentDayEl.appendChild(currentTemp);
 
+  //create p for temp
+  var currentTemp = document.createElement("p");
+  currentTemp.textContent = temp;
+  currentTemp.classList = 'pl-3';
+  currentDayEl.appendChild(currentTemp);
+
   //create p for humidity
   var currentHumidity = document.createElement("p");
   currentHumidity.textContent = humid;
@@ -161,7 +167,7 @@ var printCurrentDay = function() {
   currentUV.classList = 'pl-3';
 
   var uvSpan = document.createElement("span");
-  uvSpan = weatherObject.current.uvi;
+  uvSpan.textContent = parseFloat(weatherObject.current.uvi);
 
   //set span background color based on index value
   if (uvSpan <= 3) {
