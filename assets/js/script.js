@@ -97,6 +97,7 @@ var getWeatherObject = function() {
 
                   weatherObject = data;
                   printFiveDays();
+                  printCurrentDay();
               });
           }
           else {
@@ -106,34 +107,84 @@ var getWeatherObject = function() {
 };
 
 var printCurrentDay = function() {
+  // clear any existing content
+  currentDayContainerEl.textContent = '';
+
   var currentDayEl = document.createElement("div");
   currentDayEl.classList = 'card-body';
 
-  var cityDateIconEl = document.createElement("div");
-  var cityDateEl = document.createElement("h2");
-
   var icon = 'https://openweathermap.org/img/wn/' + weatherObject.current.weather[0].icon + '@2x.png';
+  var temp = 'Temp: ' + weatherObject.current.temp + ' °F';
+  var humid = 'Humidity: ' + weatherObject.current.humidity + '%';
+  var uvIndex = 'UV Index: ';
+
+  // create div to hold header and icon
+  var cityDateIconEl = document.createElement("div");
+
+  //create image
   var currentIcon = document.createElement("img");
   currentIcon.setAttribute('src', icon);
   currentIcon.classList = 'img-icon d-inline';
-
+  
+  // create header string
   var cityDateString = 
     currentCity + 
     ' (' +
     moment.unix(weatherObject.current.dt).format("MMMM Do YYYY") +
     ')';
 
+  // create h2 with header string
+  var cityDateEl = document.createElement("h2");
   cityDateEl.textContent = cityDateString;
   cityDateEl.classList = 'd-inline';
+
+  // append city date string and icon to div, append div to card
   cityDateIconEl.appendChild(cityDateEl);
   cityDateIconEl.appendChild(currentIcon);
   currentDayEl.appendChild(cityDateIconEl);
+
+  //create p for temp
+  var currentTemp = document.createElement("p");
+  currentTemp.textContent = temp;
+  currentTemp.classList = 'pl-3';
+  currentDayEl.appendChild(currentTemp);
+
+  //create p for humidity
+  var currentHumidity = document.createElement("p");
+  currentHumidity.textContent = humid;
+  currentHumidity.classList = 'pl-3';
+  currentDayEl.appendChild(currentHumidity);
+
+  //create p for uv index
+  var currentUV = document.createElement("p");
+  currentUV.textContent = uvIndex;
+  currentUV.classList = 'pl-3';
+
+  var uvSpan = document.createElement("span");
+  uvSpan = weatherObject.current.uvi;
+
+  //set span background color based on index value
+  if (uvSpan <= 3) {
+    uvSpan.classList = 'badge badge-success text-white';
+  }
+  else if (uvSpan > 3 && uvSpan <= 7) {
+    uvSpan.classList = 'badge badge-warning text-white';
+  }
+  else {
+    uvSpan.classList = 'badge badge-danger text-white';
+  }
+
+  currentUV.appendChild(uvSpan);
+  currentDayEl.appendChild(currentUV);
 
   currentDayContainerEl.setAttribute('style', 'margin: 15px');
   currentDayContainerEl.appendChild(currentDayEl);
 };
 
 var printFiveDays = function() {
+  // clear any existing content
+  fiveDayForcastEl.textContent = '';
+
   for (var i = 1; i <= 5; i++) {
     var date = moment.unix(weatherObject.daily[i].dt).format("MMMM Do YYYY");
     var temp = 'Temp: ' + weatherObject.daily[i].temp.day + ' °F';
