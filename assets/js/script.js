@@ -4,6 +4,7 @@ var queryCityBtnEl = document.querySelector("#query-city-btn");
 var queryCityInputEl = document.querySelector("#query-city-input");
 var fiveDayForcastEl = document.querySelector("#weather-cards");
 var currentDayContainerEl = document.querySelector("#current-day");
+var previousSearchesEl = document.querySelector("#city-list");
 
 var currentCity = '';
 
@@ -222,10 +223,43 @@ var printFiveDays = function() {
 };
 
 var cityStateToStorage = function(cityState) {
-  var cityQueryItem = {cityName:currentCity, cityQuery:cityState};
+  var saveToStorage = true;
+
+  for (var i = 0; i < cityArray.length; i++) {
+    if (cityArray[i].cityQuery === cityState) {
+      saveToStorage = false;
+    }
+  }
+
+  if (saveToStorage) {
+    var cityQueryItem = {cityName:currentCity, cityQuery:cityState};
   cityArray.push(cityQueryItem);
   var cityJsonObject = JSON.stringify(cityArray);
   localStorage.setItem('previousCities', cityJsonObject);
+  printStorageToPage();
+  } 
 };
 
+var cityStateStorageChecker = function() {
+
+};
+
+var printStorageToPage = function() {
+  previousSearchesEl.innerHTML = '';
+
+  for (var i = 0; i < cityArray.length; i++) {
+    var previousSearchLi = document.createElement("li");
+    previousSearchLi.classList = 'list-group-item';
+    previousSearchLi.textContent = cityArray[i].cityName;
+    previousSearchLi.setAttribute('data-query', cityArray[i].cityQuery);
+    previousSearchesEl.appendChild(previousSearchLi);
+  }
+};
+
+var previousSearchClick = function(event) {
+  var cityState = event.target.dataset.query;
+  getLatLon(cityState);
+};
+
+previousSearchesEl.addEventListener("click", previousSearchClick);
 queryCityBtnEl.addEventListener("click", formHandlerSubmit);
