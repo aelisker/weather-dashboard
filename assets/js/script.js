@@ -17,36 +17,35 @@ var formHandlerSubmit = function(event) {
   // get value from input
   var query = queryCityInputEl.value.trim();
 
-  // declare separate var for city and state split on comma, replace spaces with +
-  var queryCity = query.split(',')[0].replace(' ', '+').trim();
-  var queryState = query.split(',')[1].replace(' ', '+');
-
   // alert if no info given
   if (!query) {
     alert("Please enter a city and state!");
     return;
   }
-  // append city and state string, no spaces comma separated
-  else if (queryState) {
-    queryState = queryState.trim();
-    var queryCityState = queryCity + ',' + queryState;
-  }
   // if no state, prompt user to enter state
-  else {
-    alert('Please enter the US State associated with your city!');
+  if (!query.includes(',')) {
+    alert('Please fully spell out the state associated with your city! Your input should be in "City, State" format.');
+    queryCityInputEl.value = '';
     return;
-  };
+  }
+
+  // declare separate var for city and state split on comma, replace spaces with +
+  var queryCity = query.split(',')[0].replace(' ', '+').trim();
+  var queryState = query.split(',')[1].replace(' ', '+').trim();
+
+  // append city and state string, no spaces comma separated
+  var queryCityState = queryCity + ',' + queryState;
   
   if (queryCityState) {
       getLatLon(queryCityState);
       queryCityInputEl.value = '';
-      console.log(queryCityState);
   }
   else {
       alert("Please enter a city and state!");
   };
 };
 
+//use api call to get latitude and longitude from response object
 var getLatLon = function(cityState) {
   var apiUrl = 
   'http://api.openweathermap.org/data/2.5/forecast?q=' + 
@@ -64,6 +63,7 @@ var getLatLon = function(cityState) {
                   queryLat = data.city.coord.lat;
                   queryLon = data.city.coord.lon;
                   currentCity = data.city.name;
+
                   getWeatherObject(queryLat, queryLon);
                   cityStateToStorage(cityState);
               });
@@ -74,6 +74,7 @@ var getLatLon = function(cityState) {
       })
 };
 
+//use api to get object, save to global array
 var getWeatherObject = function(lat, lon) {
   weatherObject = [];
   var apiUrl = 
@@ -113,6 +114,7 @@ var printCurrentDay = function() {
   var icon = 'https://openweathermap.org/img/wn/' + weatherObject.current.weather[0].icon + '@2x.png';
   var temp = 'Temp: ' + weatherObject.current.temp + ' °F';
   var humid = 'Humidity: ' + weatherObject.current.humidity + '%';
+  var wind = 'Wind Speed: ' + weatherObject.current.wind_speed + ' MPH';
   var uvIndex = 'UV Index: ';
 
   // create div to hold header and icon
@@ -151,6 +153,12 @@ var printCurrentDay = function() {
   currentHumidity.textContent = humid;
   currentHumidity.classList = 'pl-3';
   currentDayEl.appendChild(currentHumidity);
+
+  //create p for wind speed
+  var currentWindSpeed = document.createElement("p");
+  currentWindSpeed.textContent = wind;
+  currentWindSpeed.classList = 'pl-3';
+  currentDayEl.appendChild(currentWindSpeed);
 
   //create p for uv index pretext
   var currentUV = document.createElement("p");
@@ -234,18 +242,26 @@ var loadCityArray = function() {
 var cityStateToStorage = function(cityState) {
   var saveToStorage = true;
 
+  //declare var false if array already contains searched city
   for (var i = 0; i < cityArray.length; i++) {
     if (cityArray[i].cityQuery === cityState) {
       saveToStorage = false;
     }
   }
 
+  //save if array did not find searched city
   if (saveToStorage) {
     var cityQueryItem = {cityName:currentCity, cityQuery:cityState};
-  cityArray.push(cityQueryItem);
-  var cityJsonObject = JSON.stringify(cityArray);
-  localStorage.setItem('previousCities', cityJsonObject);
-  printStorageToPage();
+
+    //if array already has nine items, delete first (oldest) indexed item
+    if (cityArray.length === 9) {
+      cityArray.shift();
+    }
+    
+    cityArray.push(cityQueryItem);
+    var cityJsonObject = JSON.stringify(cityArray);
+    localStorage.setItem('previousCities', cityJsonObject);
+    printStorageToPage();
   } 
 };
 
@@ -256,12 +272,17 @@ var printStorageToPage = function() {
     var previousSearchLi = document.createElement("li");
     previousSearchLi.classList = 'list-group-item btn btn-outline-secondary text-left';
     previousSearchLi.textContent = cityArray[i].cityName;
+
+    //using data attribute for click function later
     previousSearchLi.setAttribute('data-query', cityArray[i].cityQuery);
     previousSearchesEl.appendChild(previousSearchLi);
   }
 };
 
 var previousSearchClick = function(event) {
+  event.preventDefault();
+
+  //find current weather data for data-query attribute value of event.target
   var cityState = event.target.dataset.query;
   getLatLon(cityState);
 };
