@@ -5,10 +5,9 @@ var queryCityInputEl = document.querySelector("#query-city-input");
 var fiveDayForcastEl = document.querySelector("#weather-cards");
 var currentDayContainerEl = document.querySelector("#current-day");
 
-var queryLat = '';
-var queryLon = '';
 var currentCity = '';
 
+var cityArray = [];
 var weatherObject = [];
 
 var formHandlerSubmit = function(event) {
@@ -64,7 +63,8 @@ var getLatLon = function(cityState) {
                   queryLat = data.city.coord.lat;
                   queryLon = data.city.coord.lon;
                   currentCity = data.city.name;
-                  getWeatherObject();
+                  getWeatherObject(queryLat, queryLon);
+                  cityStateToStorage(cityState);
               });
           }
           else {
@@ -77,13 +77,13 @@ var getLatLon = function(cityState) {
       // });
 };
 
-var getWeatherObject = function() {
+var getWeatherObject = function(lat, lon) {
   weatherObject = [];
   var apiUrl = 
   'https://api.openweathermap.org/data/2.5/onecall?lat=' +
-  queryLat + 
+  lat + 
   '&lon=' + 
-  queryLon + 
+  lon + 
   '&units=imperial&cnt=5&appid=' + 
   apiKey;
 
@@ -187,6 +187,7 @@ var printFiveDays = function() {
   // clear any existing content
   fiveDayForcastEl.textContent = '';
 
+  // index 0 is current day, use index one to get next day and forward
   for (var i = 1; i <= 5; i++) {
     var date = moment.unix(weatherObject.daily[i].dt).format("MMMM Do YYYY");
     var temp = 'Temp: ' + weatherObject.daily[i].temp.day + ' °F';
@@ -218,6 +219,13 @@ var printFiveDays = function() {
 
     fiveDayForcastEl.appendChild(cardBody);
   }
+};
+
+var cityStateToStorage = function(cityState) {
+  var cityQueryItem = {cityName:currentCity, cityQuery:cityState};
+  cityArray.push(cityQueryItem);
+  var cityJsonObject = JSON.stringify(cityArray);
+  localStorage.setItem('previousCities', cityJsonObject);
 };
 
 queryCityBtnEl.addEventListener("click", formHandlerSubmit);
