@@ -48,7 +48,7 @@ var formHandlerSubmit = function(event) {
 //use api call to get latitude and longitude from response object
 var getLatLon = function(cityState) {
   var apiUrl = 
-  'http://api.openweathermap.org/data/2.5/forecast?q=' + 
+  'https://api.openweathermap.org/data/2.5/forecast?q=' + 
   cityState +
   '&units=imperial&cnt=1&appid=' + 
   apiKey;
