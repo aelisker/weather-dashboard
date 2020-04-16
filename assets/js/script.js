@@ -69,13 +69,9 @@ var getLatLon = function(cityState) {
               });
           }
           else {
-              alert('Error: ' + response.statusText);
+              alert('Error: ' + response.statusText + '. Please ensure your search is formatted as "City, State" with the state name fully typed out.');
           }
       })
-      // .catch(function(error) {
-      //     //notice this `.catch()` getting chained onto the end of the `.then()` method
-      //     alert("Unable to connect to Weather API");
-      // });
 };
 
 var getWeatherObject = function(lat, lon) {
@@ -222,6 +218,19 @@ var printFiveDays = function() {
   }
 };
 
+var loadCityArray = function() {
+  cityArray = JSON.parse(localStorage.getItem("previousCities"));
+  
+  //initialize empty array if nothing in localstorage
+  if (!cityArray) {
+    cityArray = [];
+  }
+  //if localstorage array is not empty, print storage to previous cities list
+  else {
+    printStorageToPage();
+  } 
+};
+
 var cityStateToStorage = function(cityState) {
   var saveToStorage = true;
 
@@ -240,16 +249,12 @@ var cityStateToStorage = function(cityState) {
   } 
 };
 
-var cityStateStorageChecker = function() {
-
-};
-
 var printStorageToPage = function() {
   previousSearchesEl.innerHTML = '';
 
   for (var i = 0; i < cityArray.length; i++) {
     var previousSearchLi = document.createElement("li");
-    previousSearchLi.classList = 'list-group-item';
+    previousSearchLi.classList = 'list-group-item btn btn-outline-secondary text-left';
     previousSearchLi.textContent = cityArray[i].cityName;
     previousSearchLi.setAttribute('data-query', cityArray[i].cityQuery);
     previousSearchesEl.appendChild(previousSearchLi);
@@ -263,3 +268,5 @@ var previousSearchClick = function(event) {
 
 previousSearchesEl.addEventListener("click", previousSearchClick);
 queryCityBtnEl.addEventListener("click", formHandlerSubmit);
+
+loadCityArray();
